@@ -1,4 +1,4 @@
-@DoctorAppointmentService.Api_HostAddress = http://localhost:5245
+@DoctorAppointmentService.Api_HostAddress = http://localhost:5260
 
 GET {{DoctorAppointmentService.Api_HostAddress}}/weatherforecast/
 Accept: application/json
