@@ -1,4 +1,3 @@
-using DoctorAppointmentService.Domain.Interfaces;
 using MediatR;
 
 
@@ -16,48 +15,3 @@ public class UpdateAppointmentCommand : IRequest<UpdateAppointmentResult>
     public DateTime AppointmentDate { get; set; }
 }
 
-/// <summary>
-/// Update Appointment Command Handler
-/// </summary>
-public class UpdateAppointmentCommandHandler : IRequestHandler<UpdateAppointmentCommand, UpdateAppointmentResult>
-{
-    /// <summary>
-    private readonly IAppointmentRepository _appointmentRepository;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="appointmentRepository"></param>
-    public UpdateAppointmentCommandHandler(IAppointmentRepository appointmentRepository)
-    {
-        _appointmentRepository = appointmentRepository;
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    public async Task<UpdateAppointmentResult> Handle(UpdateAppointmentCommand request, CancellationToken cancellationToken)
-    {
-        var appointment = await _appointmentRepository.GetByIdAsync(request.Id);
-
-        if (appointment == null)
-        {
-            return new UpdateAppointmentResult(false, "Appointment not found");
-        }
-
-        appointment.PatientName = request.PatientName;
-        appointment.DoctorId = request.DoctorId;
-        appointment.AppointmentDate = request.AppointmentDate;
-
-        await _appointmentRepository.UpdateAsync(appointment);
-
-        return new UpdateAppointmentResult(true, "Appointment updated successfully");
-    }
-
-
-}
