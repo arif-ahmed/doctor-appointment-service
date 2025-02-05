@@ -6,12 +6,13 @@ namespace DoctorAppointmentService.Application.Queries.Appointment.GetAllAppoinm
 
 public class GetAllAppoinmentsQuery : IRequest<GetAllAppoinmentsQueryResult>
 {
-    public string PatientName { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-    public string SortBy { get; set; }
+    public string SearchText { get; set; } = string.Empty;
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public string SortBy { get; set; } = "CreatedAt";
     public string SortOrder { get; set; } = "asc";
 }
+
 
 
 
@@ -27,10 +28,10 @@ public class GetAllAppoinmentsQueryHandler : IRequestHandler<GetAllAppoinmentsQu
 
     public async Task<GetAllAppoinmentsQueryResult> Handle(GetAllAppoinmentsQuery request, CancellationToken cancellationToken)
     {
-        var appointments = await _appointmentRepository.SearchAsync(x => x.PatientName.Contains(request.PatientName), request.Page, request.PageSize);
+        var appointments = await _appointmentRepository.SearchAsync(x => x.PatientName.Contains(request.SearchText), request.Page, request.PageSize);
         
-        var totalCount = await _appointmentRepository.CountAsync(x => x.PatientName.Contains(request.PatientName));
+        var totalCount = await _appointmentRepository.CountAsync(x => x.PatientName.Contains(request.SearchText));
 
-        return new GetAllAppoinmentsQueryResult(appointments.Select(x => new AppointmentDTO(x.Id, x.PatientName, x.DoctorId, x.AppointmentDateTime)).ToList(), totalCount);
+        return new GetAllAppoinmentsQueryResult(appointments.Select(x => new AppointmentDTO(x.Id, x.PatientName, x.DoctorId, x.AppointmentDate)).ToList(), totalCount);
     }
 }

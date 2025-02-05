@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Doctor>().HasKey(d => d.Id);
+        modelBuilder.Entity<Appointment>().HasKey(a => a.Id);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
