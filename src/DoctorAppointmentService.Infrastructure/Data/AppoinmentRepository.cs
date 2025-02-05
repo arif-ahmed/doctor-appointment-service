@@ -26,7 +26,7 @@ public class AppoinmentRepository : IAppointmentRepository
 
     public async Task<int> CountAsync(Expression<Func<Appointment, bool>>? predicate)
     {
-        return await _context.Appointments.CountAsync(predicate);   
+        return await _context.Appointments.CountAsync(predicate);
     }
 
 
@@ -63,7 +63,7 @@ public class AppoinmentRepository : IAppointmentRepository
             throw new Exception("Appointment not found");
 
         _context.Entry(entity).State = EntityState.Modified;
-        // await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return entity;
     }
 

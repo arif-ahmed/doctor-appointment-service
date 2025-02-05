@@ -102,26 +102,39 @@ namespace DoctorAppointmentService.Api.Controllers
 
 
         [HttpPut("{id}")] // This will map to /api/appointments/{id}
-        public async Task<IActionResult> UpdateAppointment(string id, [FromBody] UpdateAppointmentDto request)
+        public async Task<IActionResult> UpdateAppointment(string id, [FromBody] UpdateAppointmentRequest request)
         {
-            var command = new UpdateAppointmentCommand
+            try
             {
-                Id = id,
-                PatientName = request.PatientName,
-                DoctorId = request.DoctorId,
-                AppointmentDate = request.AppointmentDate
-            };
+                if (!ModelState.IsValid)    
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var result = await _mediator.Send(command);
+                var command = new UpdateAppointmentCommand
+                {
+                    Id = id,    
+                    PatientName = request.PatientName,
+                    DoctorId = request.DoctorId,
+                    AppointmentDate = request.AppointmentDate
+                };
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(new { Message = result.Message });
+
+                var result = await _mediator.Send(command);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { Message = result.Message });
+                }
+
+                return await Task.FromResult(Ok(new { Message = result.Message }));
             }
-
-            return await Task.FromResult(Ok(new { Message = result.Message }));
-
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> CancelAppointment(string id)
