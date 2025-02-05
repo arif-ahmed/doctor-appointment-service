@@ -1,9 +1,10 @@
-using DoctorAppointmentService.Application.Commands.Appoinment.CreateAppoinment;
+using DoctorAppointmentService.Application.Commands.Appointment.CreateAppointment;
 using FluentValidation;
 
-namespace DoctorAppointmentService.Application.Validators;
+namespace DoctorAppointmentService.Application.Commands.Appointment.CreateAppointment;
 
 public class CreateAppoinmentValidator : AbstractValidator<CreateAppoinmentCommand>
+
 {
     public CreateAppoinmentValidator()
     {

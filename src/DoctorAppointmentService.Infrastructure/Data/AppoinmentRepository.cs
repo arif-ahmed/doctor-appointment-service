@@ -20,7 +20,7 @@ public class AppoinmentRepository : IAppointmentRepository
     public async Task<Appointment> AddAsync(Appointment entity)
     {
         await _context.Appointments.AddAsync(entity);
-        // await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -40,7 +40,7 @@ public class AppoinmentRepository : IAppointmentRepository
         return await _context.Appointments.FindAsync(id);
     }
 
-    public async Task<List<Appointment>> SearchAsync(Expression<Func<Appointment, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", bool isAscending = false)
+    public async Task<List<Appointment>> SearchAsync(Expression<Func<Appointment, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", string SortOrder = "asc")
     {
         var query = _context.Appointments.AsQueryable();
 
@@ -51,11 +51,6 @@ public class AppoinmentRepository : IAppointmentRepository
         query = query.Skip((page - 1) * pageSize).Take(pageSize);
         // query = query.OrderBy(sortBy, isAscending);
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-    }
-
-    public Task<List<Appointment>> SearchAsync(Expression<Func<Appointment, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", string SortOrder = "asc")
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<Appointment> UpdateAsync(Appointment entity)

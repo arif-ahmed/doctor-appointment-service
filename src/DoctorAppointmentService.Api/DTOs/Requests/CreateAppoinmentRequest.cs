@@ -4,9 +4,9 @@ namespace DoctorAppointmentService.Api.DTOs.Requests;
 
 public class CreateAppoinmentRequest
 {
-    public string PatientName { get; set; }
+    public string PatientName { get; set; } = string.Empty;
     public DateTime AppointmentDate { get; set; }
-    public string DoctorId { get; set; }
+    public string? DoctorId { get; set; }
 }
 
 public class CreateAppoinmentRequestValidator : AbstractValidator<CreateAppoinmentRequest>

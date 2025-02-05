@@ -27,7 +27,7 @@ public class GetAppointmentByIdQueryHandler : IRequestHandler<GetAppointmentById
             throw new Exception("Appointment not found");
         }
         
-        return new GetAppointmentByIdDto(appointment.Id, appointment.PatientName, appointment.DoctorId, appointment.AppointmentDateTime);    
+        return new GetAppointmentByIdDto(appointment.Id, appointment.PatientName, appointment.DoctorId, appointment.AppointmentDate);    
     }
 }
 

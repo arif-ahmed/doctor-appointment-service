@@ -1,9 +1,8 @@
-using System.Reflection;
 using System.Text;
 using DoctorAppointmentService.Api;
 using DoctorAppointmentService.Api.Middleware;
 using DoctorAppointmentService.Api.Security;
-using DoctorAppointmentService.Application.Commands.Appoinment.CreateAppoinment;
+using DoctorAppointmentService.Application.Commands.Appointment.CreateAppointment;
 using DoctorAppointmentService.Application.Validators;
 using DoctorAppointmentService.Domain.Entities;
 using DoctorAppointmentService.Domain.Interfaces;

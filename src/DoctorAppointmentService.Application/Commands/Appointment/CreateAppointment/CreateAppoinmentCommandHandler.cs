@@ -1,16 +1,7 @@
-using DoctorAppointmentService.Domain.Entities;
 using DoctorAppointmentService.Domain.Interfaces;
 using MediatR;
 
-namespace DoctorAppointmentService.Application.Commands.Appoinment.CreateAppoinment;
-
-public class CreateAppoinmentCommand : IRequest<string>
-{
-    public required string PatientName { get; set; }
-    public required string DoctorId { get; set; }
-    public DateTime AppointmentDate { get; set; }    
-}
-
+namespace DoctorAppointmentService.Application.Commands.Appointment.CreateAppointment;
 
 public class CreateAppoinmentCommandHandler : IRequestHandler<CreateAppoinmentCommand, string>
 {
@@ -23,11 +14,21 @@ public class CreateAppoinmentCommandHandler : IRequestHandler<CreateAppoinmentCo
 
     public async Task<string> Handle(CreateAppoinmentCommand request, CancellationToken cancellationToken)
     {
-        var appointment = new Appointment {
+
+        var conflictingAppointment = await _appointmentRepository.SearchAsync(x => x.AppointmentDate == request.AppointmentDate && x.DoctorId == request.DoctorId);
+
+        if (conflictingAppointment.Any())
+        {
+            throw new Exception("Doctor is already booked at this time");
+        }
+
+        var appointment = new Domain.Entities.Appointment
+        {
             PatientName = request.PatientName,
             DoctorId = request.DoctorId,
-            AppointmentDateTime = request.AppointmentDate
+            AppointmentDate = request.AppointmentDate
         };
+
 
         await _appointmentRepository.AddAsync(appointment);
 
@@ -35,4 +36,3 @@ public class CreateAppoinmentCommandHandler : IRequestHandler<CreateAppoinmentCo
     }
 
 }
-

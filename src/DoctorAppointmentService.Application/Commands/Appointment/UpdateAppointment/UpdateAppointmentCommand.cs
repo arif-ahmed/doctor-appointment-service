@@ -13,7 +13,7 @@ public class UpdateAppointmentCommand : IRequest<UpdateAppointmentResult>
     public string Id { get; set; }
     public string PatientName { get; set; }
     public string DoctorId { get; set; }
-    public DateTime AppointmentDateTime { get; set; }
+    public DateTime AppointmentDate { get; set; }
 }
 
 /// <summary>
@@ -52,7 +52,7 @@ public class UpdateAppointmentCommandHandler : IRequestHandler<UpdateAppointment
 
         appointment.PatientName = request.PatientName;
         appointment.DoctorId = request.DoctorId;
-        appointment.AppointmentDateTime = request.AppointmentDateTime;
+        appointment.AppointmentDate = request.AppointmentDate;
 
         await _appointmentRepository.UpdateAsync(appointment);
 

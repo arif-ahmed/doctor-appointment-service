@@ -4,6 +4,6 @@ public class Appointment : BaseEntity
 {
     public required string PatientName { get; set; }
     public string PatientContactInfo { get; set; } = string.Empty;
-    public DateTime AppointmentDateTime { get; set; }
+    public DateTime AppointmentDate { get; set; }
     public required string DoctorId { get; set; } = string.Empty;    
 }
