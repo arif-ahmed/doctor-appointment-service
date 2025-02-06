@@ -26,8 +26,10 @@ public class CreateAppoinmentCommandHandler : IRequestHandler<CreateAppoinmentCo
         {
             PatientName = request.PatientName,
             DoctorId = request.DoctorId,
-            AppointmentDate = request.AppointmentDate
+            AppointmentDate = request.AppointmentDate,
+            IsActive = true
         };
+
 
 
         await _appointmentRepository.AddAsync(appointment);

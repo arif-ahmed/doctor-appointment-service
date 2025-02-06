@@ -10,18 +10,6 @@ public class UpdateAppointmentValidator : AbstractValidator<UpdateAppointmentCom
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("Id is required");
-
-        RuleFor(x => x.PatientName)
-            .NotEmpty()
-            .WithMessage("PatientName is required");
-
-        RuleFor(x => x.DoctorId)
-            .NotEmpty()
-            .WithMessage("DoctorId is required");
-
-        RuleFor(x => x.AppointmentDate)
-            .NotEmpty()
-            .WithMessage("AppointmentDateTime is required");
     }
 }
 

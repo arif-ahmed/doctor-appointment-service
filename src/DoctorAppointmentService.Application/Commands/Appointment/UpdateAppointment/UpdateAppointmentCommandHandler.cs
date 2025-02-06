@@ -39,9 +39,20 @@ public class UpdateAppointmentCommandHandler : IRequestHandler<UpdateAppointment
             return new UpdateAppointmentResult(false, "Appointment not found");
         }
 
-        appointment.PatientName = request.PatientName;
-        appointment.DoctorId = request.DoctorId;
-        appointment.AppointmentDate = request.AppointmentDate;
+        if (!string.IsNullOrEmpty(request.PatientName))
+        {
+            appointment.PatientName = request.PatientName;
+        }
+
+        if (!string.IsNullOrEmpty(request.DoctorId)) 
+        {
+            appointment.DoctorId = request.DoctorId;
+        }
+
+        if (request.AppointmentDate != appointment.AppointmentDate)
+        {
+            appointment.AppointmentDate = request.AppointmentDate;
+        }
 
         await _appointmentRepository.UpdateAsync(appointment);
 
