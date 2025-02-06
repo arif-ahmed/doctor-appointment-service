@@ -1,9 +1,11 @@
 using DoctorAppointmentService.Domain.Entities;
+using DoctorAppointmentService.Infrastructure.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorAppointmentService.Infrastructure.Persistance;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -13,7 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Doctor> Doctors { get; set; }
 
     public DbSet<Appointment> Appointments { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,7 +23,9 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Doctor>().HasKey(d => d.Id);
         modelBuilder.Entity<Appointment>().HasKey(a => a.Id);
+        modelBuilder.Entity<ApplicationUser>().HasKey(u => u.Id);
     }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -69,5 +69,41 @@ public class DoctorRepository : IDoctorRepository
     {
         throw new NotImplementedException();
     }
+
+    public string ReverseString(string str)
+    {
+        string reversedString = "";
+        for (int i = str.Length - 1; i >= 0; i--)
+        {
+            reversedString += str[i];
+        }
+        return reversedString;
+    }
+
+    public string Palindrome(string str)
+    {
+        string reversedString = ReverseString(str);
+        if (reversedString == str)
+        {
+            return "Palindrome";
+        }
+        else
+        {
+            return "Not a Palindrome";
+        }
+    }
+
+    public int GetFactorial(int num)
+    {
+        if (num == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return num * GetFactorial(num - 1);
+        }
+    }
 }
+
 
