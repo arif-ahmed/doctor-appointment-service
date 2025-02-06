@@ -2,16 +2,17 @@ namespace DoctorAppointmentService.Domain.Entities;
 
 public class User : BaseEntity
 {
-    public User(string name, string email, string passwordHash)
+    public User(string userName, string email, string passwordHash)
     {
-        Name = name;
+        UserName = userName;
         Email = email;
         PasswordHash = passwordHash;
     }
 
-    public string Name { get; set; }
+    public string UserName { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }    
 }
+
 
 

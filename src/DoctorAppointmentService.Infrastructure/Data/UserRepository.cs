@@ -1,44 +1,113 @@
-﻿
-using DoctorAppointmentService.Domain.Entities;
+﻿using DoctorAppointmentService.Domain.Entities;
 using DoctorAppointmentService.Domain.Interfaces;
+using DoctorAppointmentService.Infrastructure.Models;
+using DoctorAppointmentService.Infrastructure.Persistance;
+using DoctorAppointmentService.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DoctorAppointmentService.Infrastructure.Data;
 
 public class UserRepository : IUserRepository
 {
-    public Task<User> AddAsync(User entity)
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+
+    public UserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
-        throw new NotImplementedException();
+        _context = context;
+        _userManager = userManager;
     }
 
-    public Task<int> CountAsync(Expression<Func<User, bool>>? predicate)
+
+
+
+    public async Task<User> AddAsync(User entity)
     {
-        throw new NotImplementedException();
+        var user = new ApplicationUser
+        {
+            UserName = entity.UserName,
+            Email = entity.Email,
+            PasswordHash = entity.PasswordHash
+        };
+
+        var result = await _userManager.CreateAsync(user, entity.PasswordHash);
+        if (!result.Succeeded)
+        {
+            throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return new User(user.UserName, user.Email, user.PasswordHash);
     }
 
-    public Task<bool> DeleteAsync(string id)
+
+
+    public async Task<int> CountAsync(Expression<Func<User, bool>>? predicate)
     {
-        throw new NotImplementedException();
+        if (predicate == null)
+        {
+            return await _context.Users.CountAsync();
+        }
+
+        // Rewrite the predicate to use ApplicationUser instead of User
+        var visitor = new UserToApplicationUserExpressionVisitor();
+        var newExpression = (Expression<Func<ApplicationUser, bool>>)visitor.Visit(predicate);
+
+        return await _context.Users.CountAsync(newExpression);
     }
 
-    public Task<User> GetByIdAsync(string id)
+
+
+    public async Task<bool> DeleteAsync(string id)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        await _userManager.DeleteAsync(user);
+        return true;
     }
 
-    public Task<List<User>> SearchAsync(Expression<Func<User, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", bool isAscending = false)
+    public async Task<User> GetByIdAsync(string id)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        return new User(user.UserName, user.Email, user.PasswordHash);
     }
 
-    public Task<List<User>> SearchAsync(Expression<Func<User, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", string SortOrder = "asc")
+
+    public async Task<List<User>> SearchAsync(Expression<Func<User, bool>>? predicate, int page = 1, int pageSize = 10, string sortBy = "CreatedAt", string SortOrder = "asc")
     {
-        throw new NotImplementedException();
+        if (predicate == null)
+        {
+            return await _context.Users.Skip((page - 1) * pageSize).Take(pageSize).Select(x => new User(x.UserName, x.Email, x.PasswordHash)).ToListAsync();
+        }
+
+        // Rewrite the predicate to use ApplicationUser instead of User
+        var visitor = new UserToApplicationUserExpressionVisitor();
+        var newExpression = (Expression<Func<ApplicationUser, bool>>)visitor.Visit(predicate);
+        return await _context.Users.Where(newExpression).Skip((page - 1) * pageSize).Take(pageSize).Select(x => new User(x.UserName, x.Email, x.PasswordHash)).ToListAsync();
     }
 
-    public Task<User> UpdateAsync(User entity)
+
+    public async Task<User> UpdateAsync(User entity)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByIdAsync(entity.Id);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        user.UserName = entity.UserName;
+        user.Email = entity.Email;
+        await _userManager.UpdateAsync(user);
+        return new User(user.UserName, user.Email, user.PasswordHash);
     }
 }

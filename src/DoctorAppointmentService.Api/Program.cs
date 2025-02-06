@@ -7,6 +7,7 @@ using DoctorAppointmentService.Application.Validators;
 using DoctorAppointmentService.Domain.Entities;
 using DoctorAppointmentService.Domain.Interfaces;
 using DoctorAppointmentService.Infrastructure.Data;
+using DoctorAppointmentService.Infrastructure.Models;
 using DoctorAppointmentService.Infrastructure.Persistance;
 using FluentValidation;
 using MediatR;
@@ -31,6 +32,11 @@ builder.Services.AddSingleton<ITokenService, JwtTokenService>();
 // var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer("Server=.\\SQLEXPRESS;Database=DoctorAppointmentService;Trusted_Connection=True;MultipleActiveResultSets=True;TrustServerCertificate=True;"));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 
 builder.Services.AddAuthentication(options =>
 {
