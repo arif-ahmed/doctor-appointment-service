@@ -10,9 +10,6 @@ public static class SeedData
     {
         using (var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
         {
-            // Ensure the database is migrated
-            context.Database.Migrate();
-
             // Insert if no users exist
             if (!context.Doctors.Any())
             {
