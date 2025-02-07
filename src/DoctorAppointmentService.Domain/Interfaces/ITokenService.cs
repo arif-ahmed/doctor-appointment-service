@@ -1,4 +1,4 @@
-namespace DoctorAppointmentService.Api.Security;
+namespace DoctorAppointmentService.Domain.Interfaces;
 
 public interface ITokenService
 {

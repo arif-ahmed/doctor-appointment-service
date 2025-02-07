@@ -1,7 +1,6 @@
-using System.Text;
+﻿using System.Text;
 using DoctorAppointmentService.Api;
 using DoctorAppointmentService.Api.Middleware;
-using DoctorAppointmentService.Api.Security;
 using DoctorAppointmentService.Application.Commands.Appointment.CreateAppointment;
 using DoctorAppointmentService.Application.Validators;
 using DoctorAppointmentService.Domain.Entities;
@@ -9,11 +8,13 @@ using DoctorAppointmentService.Domain.Interfaces;
 using DoctorAppointmentService.Infrastructure.Data;
 using DoctorAppointmentService.Infrastructure.Models;
 using DoctorAppointmentService.Infrastructure.Persistance;
+using DoctorAppointmentService.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -27,8 +28,6 @@ builder.Services.AddTransient<IDoctorRepository, DoctorRepository>();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<ITokenService, JwtTokenService>();
 
-
-
 // var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer("Server=.\\SQLEXPRESS;Database=DoctorAppointmentService;Trusted_Connection=True;MultipleActiveResultSets=True;TrustServerCertificate=True;"));
@@ -40,9 +39,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -56,16 +54,51 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new ArgumentNullException("JwtSettings:Audience is missing!"),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("JwtSettings:Key is missing!")))
     };
+
+    // 🚀 Add this for debugging
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            Console.WriteLine($"Raw token: {context.Request.Headers["Authorization"]}");
+            return Task.CompletedTask;
+
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            {
+                
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully.");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Console.WriteLine($"Authentication challenge triggered: {context.ErrorDescription}");
+            return Task.CompletedTask;
+        }
+    };
+
 });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Appointment.Read", policy => policy.RequireClaim("scope", "appointment.read"));
-    options.AddPolicy("Appointment.Write", policy => policy.RequireClaim("scope", "appointment.write"));
-    options.AddPolicy("Appointment.Delete", policy => policy.RequireClaim("scope", "appointment.delete"));
-    options.AddPolicy("Appointment.Update", policy => policy.RequireClaim("scope", "appointment.update"));
-    options.AddPolicy("Appointment.Create", policy => policy.RequireClaim("scope", "appointment.create"));
-});
+builder.Services.AddAuthorization();
+
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("Appointment.Read", policy => policy.RequireClaim("scope", "appointment.read"));
+//    options.AddPolicy("Appointment.Write", policy => policy.RequireClaim("scope", "appointment.write"));
+//    options.AddPolicy("Appointment.Delete", policy => policy.RequireClaim("scope", "appointment.delete"));
+//    options.AddPolicy("Appointment.Update", policy => policy.RequireClaim("scope", "appointment.update"));
+//    options.AddPolicy("Appointment.Create", policy => policy.RequireClaim("scope", "appointment.create"));
+//});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -111,10 +144,13 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Appointment API V1");
         options.RoutePrefix = string.Empty; // Swagger at root URL
     });
+
+    IdentityModelEventSource.ShowPII = true;
 }
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

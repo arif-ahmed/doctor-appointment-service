@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using DoctorAppointmentService.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DoctorAppointmentService.Api.Security;
+namespace DoctorAppointmentService.Infrastructure.Services;
 
 public class JwtTokenService : ITokenService
 {
@@ -28,7 +30,7 @@ public class JwtTokenService : ITokenService
             issuer: issuer,
             audience: audience,
             claims: new List<Claim>(),
-            expires: DateTime.Now.AddMinutes(durationInMinutes),
+            expires: DateTime.Now.AddDays(1),
             signingCredentials: credentials
         );
 
